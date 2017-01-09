@@ -7,9 +7,18 @@
     "type": "git",
     "url": "/Users/adamspe/mapping-server/repos/user-resource-container.git"
   },
+  "scripts": {
+    "start": "node index.js",
+    "test": "make test"
+  },
   "author": "adamspe@gmail.com",
   "private": true,
   "dependencies": {
       "app-service": "file:../app-container"
+  },
+  "devDependencies": {
+      "app-container-login": "file:../app-container-login",
+      "should": "^7.1.1",
+      "supertest": "^1.1.0"
   }
 }

@@ -1,1 +1,1 @@
-require('./container').start();
+require('./container')().start();

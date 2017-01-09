@@ -1,3 +1,5 @@
 var AppContainer = require('app-container');
 
-module.exports = (new AppContainer({})).addResource(AppContainer.userResource());
+module.exports = function(config) {
+    return (new AppContainer(config||{})).addResource(AppContainer.userResource());
+};
