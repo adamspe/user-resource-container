@@ -1,0 +1,15 @@
+{
+  "name": "user-app-service",
+  "version": "1.0.0",
+  "description": "user service",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "/Users/adamspe/mapping-server/user-app-service.git"
+  },
+  "author": "adamspe@gmail.com",
+  "private": true,
+  "dependencies": {
+      "app-service": "file:../app-service"
+  }
+}
