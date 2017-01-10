@@ -6,15 +6,15 @@ var pkg = require('../../package.json'),
 
 var util = {
     api: undefined,
-    User: AppContainer.userModel(),
+    User: AppContainer.User,
     debug: require('debug')('app-test'),
     before: function(done) {
-        var container = require('../../container')({
+        var container = require('../../index').container({
             db: {
                 db: pkg.name+'-test'
             }
         });
-        require('app-container-login')(container,true/*test*/);
+        require('app-container-login').init(container,true/*test*/);
         util.api = supertest.agent(container.app());
         done();
     },

@@ -8,7 +8,7 @@
     "url": "/Users/adamspe/mapping-server/repos/user-resource-container.git"
   },
   "scripts": {
-    "start": "node index.js",
+    "start": "node start.js",
     "test": "make test"
   },
   "author": "adamspe@gmail.com",
