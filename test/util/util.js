@@ -12,6 +12,9 @@ var util = {
         var container = require('../../index').container({
             db: {
                 db: pkg.name+'-test'
+            },
+            initPipeline: {
+                loggers: function(app) {}
             }
         });
         require('app-container-login').init(container,true/*test*/);
