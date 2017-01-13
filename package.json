@@ -10,7 +10,7 @@
     "url": "https://github.com/adamspe/user-resource-container.git"
   },
   "scripts": {
-    "start": "node --preserve-symlinks server.js",
+    "start": "node server.js",
     "test": "make test"
   },
   "dependencies": {

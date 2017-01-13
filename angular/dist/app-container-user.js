@@ -1,14 +1,29 @@
 /*
  * app-container-user
- * Version: 1.0.0 - 2017-01-12
+ * Version: 1.0.0 - 2017-01-13
  */
+
+angular.module('app-container-user.filters',[
+])
+.filter('fullName',[function(){
+    return function(user) {
+        if(user && (user.fname || user.sname)){
+            if(user.fname && user.sname) {
+                return user.fname + ' ' + user.sname;
+            }
+            return user.fname ? user.fname : user.sname;
+        }
+    };
+}]);
 
 angular.module('app-container-user',[
     'app-container-common',
-    'app-container-user.uadmin'
+    'app-container-user.filters',
+    'app-container-user.uadmin',
+    'templates-app-container-user'
 ])
 .service('User',['$appService',function($appService) {
-    var User = $appService('/api/user/:id'),
+    var User = $appService('/api/v1/user/:id'),
         me;
     // the server side uses a role array but for the purposes
     // of the starter app dumbing this down to admin/non-admin.
@@ -123,7 +138,7 @@ angular.module("js/uadmin/user-administration.html", []).run(["$templateCache", 
     "");
 }]);
 
-angular.module('app.uadmin',[
+angular.module('app-container-user.uadmin',[
 ])
 .controller('EditUserController',['$scope','$uibModalInstance','User','theUser','existingEmails','title',function($scope,$uibModalInstance,User,theUser,existingEmails,title){
     $scope.me = User.me();
