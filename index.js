@@ -6,7 +6,7 @@ var AppContainer = require('app-container'),
             }));
         },
         container: function(config) {
-            return appModule.init(new AppContainer(config||{}));
+            return appModule.init(new AppContainer().init(config||{}));
         }
     };
 

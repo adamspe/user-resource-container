@@ -17,7 +17,7 @@ var util = {
                 loggers: function(app) {}
             }
         });
-        require('app-container-login').init(container,true/*test*/);
+        require('app-container-login').init(container,{logout: true});
         util.api = supertest.agent(container.app());
         done();
     },
