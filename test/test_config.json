@@ -4,5 +4,6 @@
     },
     "app-container-login": {
         "logout": true
-    }
+    },
+    "disableCSRF": true
 }
