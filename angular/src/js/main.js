@@ -5,7 +5,7 @@ angular.module('app-container-user',[
     'templates-app-container-user'
 ])
 .service('User',['$appService',function($appService) {
-    var User = $appService('/api/v1/user/:id'),
+    var User = $appService('user/:id'),
         me;
     // the server side uses a role array but for the purposes
     // of the starter app dumbing this down to admin/non-admin.
