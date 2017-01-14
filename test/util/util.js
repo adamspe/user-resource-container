@@ -10,13 +10,8 @@ var util = {
     debug: require('debug')('app-test'),
     before: function(done) {
         var container = require('../../index').container({
-            db: {
-                db: pkg.name+'-test'
-            },
-            initPipeline: {
                 loggers: function(app) {}
-            }
-        });
+            });
         require('app-container-login').init(container,{logout: true});
         util.api = supertest.agent(container.app());
         done();

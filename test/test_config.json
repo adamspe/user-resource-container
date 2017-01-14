@@ -1,0 +1,8 @@
+{
+    "database": {
+        "db": "user-resource-container-test"
+    },
+    "app-container-login": {
+        "logout": true
+    }
+}
