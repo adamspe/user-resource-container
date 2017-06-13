@@ -1,23 +1,22 @@
-<table class="table table-striped table-condensed user-administration" ng-if="me.isAdmin()">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>E-Mail</th>
-            <th><span class="hidden-xs">Administrator</span><span class="visible-xs">Admin</span></th>
-            <th class="text-right"><a href ng-click="create()" uib-tooltip="New User" tooltip-placement="left"><i class="fa fa-plus"></i></a></th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr ng-repeat="user in users">
-            <td>{{user | fullName}}</td>
-            <td><a ng-href="mailto:{{user.email}}">{{user.email}}</a></td>
-            <td><i ng-if="user.isAdmin()" class="fa fa-check"></i></td>
-            <td class="text-right">
-                <ul class="list-inline">
-                    <li><a href ng-click="edit(user)" uib-tooltip="Edit User" tooltip-placement="left"><i class="fa fa-pencil"></i></a></li>
-                    <li><a href ng-click="delete(user)" uib-tooltip="Delete User" tooltip-placement="left"><i class="fa fa-times"></i></a></li>
-                </ul>
-            </td>
-        </tr>
-    </tbody>
-</table>
+<md-button id="uadmin-add-user" class="md-raised md-icon-button" ng-if="me.isAdmin()" ng-click="create()">
+    <md-tooltip md-direction="right">New user</md-tooltip>
+</md-button>
+<div class="solo-view" ng-if="me.isAdmin()">
+    <section class="app-panel user-admin">
+        <md-toolbar class="md-toolbar-tools">
+            <h2 flex md-truncate>User administration</h2>
+        </md-toolbar>
+        <md-content flex>
+        <md-list>
+            <md-list-item ng-repeat="user in users" ng-click="edit(user)" ng-disabled="user._id === me._id">
+                <md-list-item-text layout="column" class="md-1-line">
+                    <h4>{{user | fullName}}<span ng-if="user.isAdmin()"> (administrator)</span> <a ng-href="mailto:{{user.email}}">{{user.email}}</a></h4>
+                </md-list-item-text>
+                <md-button ng-if="user._id !== me._id" class="md-icon-button delete-user" aria-label="Delete user" ng-click="delete(user)">
+                    <md-tooltip md-direction="left">Delete user</md-tooltip>
+                </md-button>
+            </md-list-item>
+        </md-list>
+    </md-content>
+    </section>
+</div>

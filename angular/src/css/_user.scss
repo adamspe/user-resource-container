@@ -1,0 +1,28 @@
+user-administration {
+    #uadmin-add-user {
+        @extend .left-icon;
+        @extend .left-icon.two;
+        &:before {
+            content: '\f234';
+        }
+    }
+    md-list-item-text > h4 {
+        margin: 0px;
+    }
+    .md-icon-button.delete-user {
+        position: absolute;
+        top: $baseline-grid;
+        right: $baseline-grid;
+        &:before {
+            font-family: 'FontAwesome';
+            content: '\f235';
+            font-size: $icon-size;
+        }
+    }
+    .app-panel.user-admin {
+        height: 600px; // fits iPhone 6
+        @media(min-width: $layout-breakpoint-sm) {
+            height: auto;
+        }
+    }
+}

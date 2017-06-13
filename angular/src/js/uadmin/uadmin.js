@@ -1,19 +1,16 @@
 angular.module('app-container-user.uadmin',[
 ])
-.controller('EditUserController',['$scope','$uibModalInstance','User','theUser','existingEmails','title',function($scope,$uibModalInstance,User,theUser,existingEmails,title){
+.controller('EditUserController',['$scope','$mdDialog','User',function($scope,$mdDialog,User){
     $scope.me = User.me();
-    $scope.title = title;
     $scope.isModal = true;
-    $scope.user = theUser;
-    $scope.existingEmails = existingEmails;
-    $scope.dismiss = $uibModalInstance.dismiss;
-    $scope.resetPassword = theUser._id ? false : true;
-    $scope.isAdmin = theUser.isAdmin();
+    $scope.cancel = $mdDialog.cancel;
+    $scope.resetPassword = $scope.user._id ? false : true;
+    $scope.isAdmin = $scope.user.isAdmin();
     $scope.$watch('isAdmin',function(){
         $scope.user[$scope.isAdmin ? 'makeAdmin' : 'makeNormal']();
     });
     $scope.ok = function() {
-        $uibModalInstance.close($scope.user);
+        $mdDialog.hide($scope.user);
     };
 }])
 .directive('userProfile',['$log','User','NotificationService',function($log,User,NotificationService){
@@ -73,6 +70,25 @@ angular.module('app-container-user.uadmin',[
         }
     };
 }])
+.directive('passwordCompare',['$q','$parse',function($q,$parse){
+    return {
+        require: 'ngModel',
+        link: function($scope,$element,$attrs,$ctrl) {
+            var user = $parse($attrs.passwordCompare)($scope);
+            if(user && $attrs.passwordKey && $attrs.passwordCompareKey) {
+                $ctrl.$asyncValidators[$attrs.passwordCompareKey] = function(modelValue,newValue) {
+                    var def = $q.defer();
+                    if(newValue === user[$attrs.passwordKey]) {
+                        def.resolve(true);
+                    } else {
+                        def.reject();
+                    }
+                    return def.promise;
+                };
+            }
+        }
+    };
+}])
 .directive('passwordConfirm',[function(){
     return {
         restrict: 'E',
@@ -82,71 +98,66 @@ angular.module('app-container-user.uadmin',[
         }
     };
 }])
-.directive('userAdministration',['$log','$uibModal','User','DialogService','NotificationService',function($log,$uibModal,User,DialogService,NotificationService){
+.directive('userAdministration',['$log','User','DialogService','NotificationService','$mdDialog',function($log,User,DialogService,NotificationService,$mdDialog){
     return {
         restrict: 'E',
         templateUrl: 'js/uadmin/user-administration.html',
         link: function($scope,$element,$attrs) {
             function list() {
+                // Not currently designed for scalability since user objects are small things
+                // this and the existingEmails directive could deal with paged/dynamic data
+                // at some point if necessary
                 User.query(function(users){
-                    $scope.users = users.list.filter(function(u){
-                        return u._id !== $scope.me._id;
-                    });
+                    $scope.users = users.list;
+                    $scope.emails = $scope.users.map(function(u) { return u.email; });
                 });
                 $scope.create = function() {
-                    $uibModal.open({
+                    $mdDialog.show({
                         templateUrl: 'js/uadmin/edit-user.html',
                         controller: 'EditUserController',
-                        windowClass: 'edit-user',
-                        size: 'lg',
-                        backdrop: 'static',
-                        keyboard: false,
-                        resolve: {
-                            theUser: function() { return new User({roles: ['user']}); },
-                            title: function() { return 'Create User'; },
-                            existingEmails: function() { return $scope.users.map(function(u) { return u.email; }).concat([$scope.me.email]); }
-                        }
-                    }).result.then(function(user){
+                        scope: angular.extend($scope.$new(true),{
+                                user: new User({roles: ['user']}),
+                                title: 'New user',
+                                existingEmails: $scope.emails
+                            }),
+                        fullscreen: true
+                    }).then(function(user) {
                         user.$save(function(){
-                            NotificationService.addInfo('User created.');
+                            NotificationService.addInfo('User '+user.email+' created.');
                             list();
                         },NotificationService.addError);
-                    });
+                    },angular.noop);
                 };
                 $scope.edit = function(user) {
-                    $uibModal.open({
+                    $mdDialog.show({
                         templateUrl: 'js/uadmin/edit-user.html',
                         controller: 'EditUserController',
-                        windowClass: 'edit-user',
-                        size: 'lg',
-                        backdrop: 'static',
-                        keyboard: false,
-                        resolve: {
-                            theUser: function() { return angular.extend(new User(),user); },
-                            title: function() { return 'Edit User'; },
-                            existingEmails: function() {
-                                return $scope.users.filter(function(u){
-                                    return u._id !== user._id;
-                                }).map(function(u) { return u.email; }).concat([$scope.me.email]);
-                            }
-                        }
-                    }).result.then(function(updates){
+                        scope: angular.extend($scope.$new(true),{
+                                user: new User(angular.copy(user,{})),
+                                title: 'Edit user',
+                                existingEmails: $scope.emails.filter(function(e) { return e !== user.email; })
+                            }),
+                        fullscreen: true
+                    }).then(function(updates) {
                         angular.extend(user,updates);
                         user.$update({id: user._id},function(){
-                            NotificationService.addInfo('User updated.');
+                            NotificationService.addInfo('User '+user.email+' updated.');
                         },NotificationService.addError);
-                    });
+                    },angular.noop);
                 };
                 $scope.delete = function(user) {
-                    DialogService.confirm({
-                        question: 'Are you sure you want to delete '+user.email+'?',
-                        warning: 'This cannot be undone.'
-                    }).then(function(){
-                        user.$remove({id:user._id},function(){
-                            NotificationService.addInfo('User deleted.');
-                            list();
-                        },NotificationService.addError);
-                    });
+                    $mdDialog.show($mdDialog.confirm()
+                        .title('Are you sure you want to delete '+user.email+'?')
+                        .textContent('This cannot be undone.')
+                        .ariaLabel('Delete user')
+                        .ok('Yes')
+                        .cancel('No'))
+                        .then(function(){
+                                user.$remove({id:user._id},function(){
+                                    NotificationService.addInfo('User '+user.email+' deleted.');
+                                    list();
+                                },NotificationService.addError);
+                            },angular.noop);
                 };
             }
             User.me().$promise.then(function(me) {
